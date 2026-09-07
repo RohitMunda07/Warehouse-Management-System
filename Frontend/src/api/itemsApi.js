@@ -211,7 +211,7 @@ export const getWarehouseAnalytics = () =>
  * Get inventory value statistics
  * @returns {Promise<Object>} Total inventory value data
  * 
- * Backend: GET /api/items/stats/inventory-value
+ * Backend: GET /api/items/analytics/inventory-value
  * 
  * Returns:
  * {
@@ -223,7 +223,7 @@ export const getWarehouseAnalytics = () =>
  * Use case: Inventory value card on dashboard
  */
 export const getInventoryValue = () =>
-  client.get('/items/stats/inventory-value')
+  client.get('/items/analytics/inventory-value')
     .then((res) => unwrapResponseData(res))
     .catch((error) => {
       console.error('Error fetching inventory value:', error);
@@ -234,7 +234,7 @@ export const getInventoryValue = () =>
  * Get statistics grouped by category
  * @returns {Promise<Array>} Category breakdown with counts and values
  * 
- * Backend: GET /api/items/stats/category
+ * Backend: GET /api/items/analytics/category
  * 
  * Returns array of:
  * {
@@ -248,7 +248,7 @@ export const getInventoryValue = () =>
  * Use case: Category breakdown chart
  */
 export const getCategoryStats = () =>
-  client.get('/items/stats/category')
+  client.get('/items/analytics/category')
     .then((res) => unwrapResponseData(res))
     .catch((error) => {
       console.error('Error fetching category stats:', error);
@@ -339,4 +339,18 @@ export const handleApiError = (error) => {
     errors: []
   };
 };
+
+/**
+ * Get inventory summary and analytics for the Reports module.
+ * @returns {Promise<Object>} Overview, stock health, category totals, low-stock items
+ *
+ * Backend: GET /api/items/reports
+ */
+export const getInventoryReports = () =>
+  client.get('/items/reports')
+    .then((res) => unwrapResponseData(res))
+    .catch((error) => {
+      console.error('Error fetching inventory reports:', error);
+      throw error;
+    });
 

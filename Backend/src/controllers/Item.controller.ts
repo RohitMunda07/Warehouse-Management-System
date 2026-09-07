@@ -480,3 +480,86 @@ export const getWarehouseAnalytics = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Failed to fetch warehouse analytics", [], "");
     }
 });
+
+/* -------------------------------------------------------------------------- */
+/*                       GET INVENTORY REPORTS                                  */
+/* -------------------------------------------------------------------------- */
+
+export const getInventoryReports = asyncHandler(async (req, res) => {
+    try {
+        const filter: any = { status: "active" };
+        const items = await ItemModel.find(filter).lean();
+
+        const totalItems = items.length;
+        const totalQuantity = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+        const totalValue = items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.unitCost || 0), 0);
+        const lowStockItems = items.filter((item) => Number(item.quantity || 0) <= Number(item.reorderThreshold || 0));
+
+        const stockHealth = {
+            healthy: items.filter((item) => Number(item.quantity || 0) > Number(item.reorderThreshold || 0) * 1.5).length,
+            watch: items.filter((item) => {
+                const quantity = Number(item.quantity || 0);
+                const reorderThreshold = Number(item.reorderThreshold || 0);
+                return quantity > reorderThreshold && quantity <= reorderThreshold * 1.5;
+            }).length,
+            reorder: lowStockItems.length
+        };
+
+        const byCategoryMap = new Map<string, any>();
+        items.forEach((item) => {
+            const category = item.category || "Uncategorized";
+            const existing = byCategoryMap.get(category) || {
+                category,
+                count: 0,
+                totalQuantity: 0,
+                totalValue: 0,
+                low: 0
+            };
+
+            const quantity = Number(item.quantity || 0);
+            const unitCost = Number(item.unitCost || 0);
+
+            existing.count += 1;
+            existing.totalQuantity += quantity;
+            existing.totalValue += quantity * unitCost;
+            existing.low += quantity <= Number(item.reorderThreshold || 0) ? 1 : 0;
+
+            byCategoryMap.set(category, existing);
+        });
+
+        const byCategory = [...byCategoryMap.values()].sort((a, b) => b.totalValue - a.totalValue);
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    overview: {
+                        totalItems,
+                        totalQuantity,
+                        totalValue,
+                        lowStockCount: lowStockItems.length,
+                        categoryCount: byCategory.length
+                    },
+                    stockHealth,
+                    byCategory,
+                    lowStock: lowStockItems
+                        .slice()
+                        .sort((a, b) => Number(a.quantity || 0) - Number(b.quantity || 0))
+                        .slice(0, 6)
+                        .map((item) => ({
+                            id: item._id,
+                            sku: item.sku,
+                            name: item.name,
+                            category: item.category,
+                            quantity: Number(item.quantity || 0),
+                            reorderThreshold: Number(item.reorderThreshold || 0),
+                            unitCost: Number(item.unitCost || 0)
+                        }))
+                },
+                "Inventory report fetched successfully"
+            )
+        );
+    } catch (error) {
+        throw new ApiError(500, "Failed to fetch inventory report", [], "");
+    }
+});

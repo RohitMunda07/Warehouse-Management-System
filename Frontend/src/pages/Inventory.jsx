@@ -134,7 +134,7 @@ export default function Inventory() {
                       {it.quantity} units
                     </td>
                     <td className="qty" style={{ textAlign: 'left' }}>
-                      ${it.unitCost.toFixed(2)}
+                      ₹{it.unitCost.toFixed(2)}
                     </td>
                     <td>
                       <StatusBadge label={s.label} color={s.color} />

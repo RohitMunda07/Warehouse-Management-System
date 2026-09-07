@@ -46,7 +46,7 @@ export default function Dashboard() {
               direction={stats.lowStock ? 'down' : 'up'}
             />
             <StatCard label="Pending shipments" value="—" delta="Connect a Shipping module" />
-            <StatCard label="Inventory value" value={`$${stats.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
+            <StatCard label="Inventory value" value={`₹${stats.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
           </div>
 
           <div className="panel-row">

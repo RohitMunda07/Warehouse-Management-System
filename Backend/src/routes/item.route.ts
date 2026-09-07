@@ -10,7 +10,8 @@ import {
     getInventoryValue,
     adjustStock,
     getCategoryStats,
-    getWarehouseAnalytics
+    getWarehouseAnalytics,
+    getInventoryReports
 } from "../controllers/Item.controller.js";
 
 const router = Router();
@@ -30,6 +31,9 @@ router.get("/analytics/category", getCategoryStats);
 
 // Get low stock items
 router.get("/stock/low-stock", getLowStockItems);
+
+// Inventory report overview
+router.get("/reports", getInventoryReports);
 
 // Search items
 router.get("/search", searchItems);

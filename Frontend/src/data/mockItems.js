@@ -9,4 +9,12 @@ export const mockItems = [
   { id: 'itm-6', sku: 'SKU-40217', name: 'Safety goggles', category: 'Safety', location: 'C-09-A', quantity: 18, reorderThreshold: 20, maxStock: 80, unitCost: 3.75, notes: '' },
   { id: 'itm-7', sku: 'SKU-90031', name: 'USB barcode scanner', category: 'Electronics', location: 'D-01-A', quantity: 6, reorderThreshold: 4, maxStock: 20, unitCost: 42.00, notes: '' },
   { id: 'itm-8', sku: 'SKU-12987', name: 'Cordless drill', category: 'Tools', location: 'D-04-C', quantity: 11, reorderThreshold: 5, maxStock: 15, unitCost: 89.99, notes: '' },
+  { id: 'itm-9', sku: 'SKU-50118', name: 'Steel anchor bolts', category: 'Fasteners', location: 'A-09-B', quantity: 74, reorderThreshold: 35, maxStock: 120, unitCost: 1.90, notes: '' },
+  { id: 'itm-10', sku: 'SKU-77142', name: 'Industrial labels', category: 'Office', location: 'E-02-A', quantity: 210, reorderThreshold: 100, maxStock: 300, unitCost: 0.60, notes: '' },
+  { id: 'itm-11', sku: 'SKU-66073', name: 'Heavy-duty gloves', category: 'Safety', location: 'C-05-B', quantity: 33, reorderThreshold: 25, maxStock: 90, unitCost: 7.80, notes: '' },
+  { id: 'itm-12', sku: 'SKU-23044', name: 'A4 shipping labels', category: 'Packaging', location: 'B-10-C', quantity: 160, reorderThreshold: 60, maxStock: 220, unitCost: 1.20, notes: '' },
+  { id: 'itm-13', sku: 'SKU-18409', name: 'Laser measuring tool', category: 'Tools', location: 'D-06-D', quantity: 9, reorderThreshold: 7, maxStock: 25, unitCost: 58.50, notes: '' },
+  { id: 'itm-14', sku: 'SKU-89011', name: 'Warehouse pallet jack', category: 'Equipment', location: 'F-01-A', quantity: 4, reorderThreshold: 3, maxStock: 12, unitCost: 420.00, notes: '' },
+  { id: 'itm-15', sku: 'SKU-33328', name: 'Lubricant spray', category: 'Maintenance', location: 'E-08-C', quantity: 68, reorderThreshold: 20, maxStock: 150, unitCost: 12.40, notes: '' },
+  { id: 'itm-16', sku: 'SKU-77621', name: 'Stainless steel screws', category: 'Fasteners', location: 'A-12-D', quantity: 22, reorderThreshold: 40, maxStock: 180, unitCost: 0.26, notes: '' },
 ];

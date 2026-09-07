@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec tsx watch src/index.ts"
+    "dev": "nodemon --exec tsx watch src/index.ts",
+    "seed:items": "tsx scripts/seed-sample-items.ts"
   },
   "keywords": [],
   "author": "",
