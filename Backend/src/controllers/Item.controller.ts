@@ -62,7 +62,35 @@ export const getItemById = asyncHandler(async (req, res) => {
 
 export const createItem = asyncHandler(async (req, res) => {
     try {
-        const validation = CreateItemSchema.safeParse(req.body);
+        const { location, ...incomingBody } = req.body ?? {};
+
+        const normalizedBody = {
+            ...incomingBody,
+            sku: incomingBody.sku || `SKU-${Date.now().toString().slice(-6)}`,
+            name: incomingBody.name?.trim(),
+            category: incomingBody.category?.trim(),
+            description: incomingBody.description ?? incomingBody.notes ?? "",
+            notes: incomingBody.notes ?? incomingBody.description ?? "",
+            quantity: Number(incomingBody.quantity ?? 0),
+            unit: incomingBody.unit || "piece",
+            unitCost: Number(incomingBody.unitCost ?? 0),
+            sellingPrice: Number(incomingBody.sellingPrice ?? incomingBody.unitCost ?? 0),
+            reorderThreshold: Number(incomingBody.reorderThreshold ?? 0),
+            maxStock: Number(incomingBody.maxStock ?? Math.max(Number(incomingBody.quantity ?? 0), 1)),
+            safetyStock: Number(incomingBody.safetyStock ?? 0),
+            status: incomingBody.status || "active",
+            location: location || incomingBody.location || "",
+            warehouseStocks: incomingBody.warehouseStocks?.length
+                ? incomingBody.warehouseStocks
+                : [{
+                    location: "aisle_a",
+                    quantity: Number(incomingBody.quantity ?? 0),
+                    binNumber: location || incomingBody.location || "MAIN"
+                }],
+            lastRestocked: incomingBody.lastRestocked || new Date().toISOString()
+        };
+
+        const validation = CreateItemSchema.safeParse(normalizedBody);
         if (!validation.success) {
             throw new ApiError(
                 400,

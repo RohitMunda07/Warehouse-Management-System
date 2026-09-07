@@ -9,23 +9,10 @@ const UserZodSchema = z.object({
         .min(2, { message: "Fullname should have atleast 2 characters" })
         .max(30),
 
-    // Was missing entirely. `username` is required + unique on the Mongoose
-    // model — without this, a request could pass validation here and still
-    // fail (or silently omit username) at the DB layer.
-    username: z
-        .string()
-        .trim()
-        .toLowerCase()
-        .min(3, { message: "Username should have atleast 3 characters" })
-        .max(20)
-        .regex(/^[a-z0-9_]+$/, { message: "Username can only contain lowercase letters, numbers, and underscores" }),
-
     email: z
         .string()
         .email({ message: "Please enter a valid email" }),
 
-    // Was min(6) — the Mongoose schema requires minlength: 8. A 6-7 char
-    // password used to pass this check and then fail Mongoose validation.
     password: z
         .string()
         .min(8, { message: "Password must be at least 8 characters" }),

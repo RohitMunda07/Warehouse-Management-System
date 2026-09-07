@@ -11,9 +11,6 @@ const configureDnsServers = (): void => {
 };
 
 const connectDB = async (): Promise<void> => {
-    // console.log("before db connection");
-    // console.log(process.env.MONGODB_URI);
-
     configureDnsServers();
 
     try {
@@ -31,6 +28,17 @@ const connectDB = async (): Promise<void> => {
         });
 
         console.log("MongoDB connected successfully");
+
+        // Cleanup old indexes after connection
+        try {
+            const userCollection = mongoose.connection.collection("usermodels");
+            await userCollection.dropIndex("username_1").catch(() => {
+                // Index might not exist, that's okay
+            });
+            console.log("✅ Cleaned up old username index");
+        } catch (error) {
+            // Silent fail if cleanup not needed
+        }
     } catch (error) {
         console.error("MongoDB connection failed:", error);
         process.exit(1);

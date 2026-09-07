@@ -61,17 +61,15 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, parsed.error?.issues[0]?.message || "Validation failed", [], "")
     }
 
-    const { email, phone, username } = parsed.data
+    const { email, phone } = parsed.data
 
-    // Checks email/phone AND username — username is unique on the model
-    // too, so a duplicate username used to skip this clean check entirely
-    // and crash into a raw MongoDB E11000 error instead of a friendly 409.
+    // Checks email/phone for duplicates
     const existedUser = await UserModel.findOne({
-        $or: [{ email }, { phone }, { username }]
+        $or: [{ email }, { phone }]
     })
 
     if (existedUser) {
-        throw new ApiError(409, "User with email, phone, or username already exists", [], "")
+        throw new ApiError(409, "User with email or phone already exists", [], "")
     }
 
     const filteredData = Object.fromEntries(

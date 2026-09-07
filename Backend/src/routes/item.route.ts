@@ -23,10 +23,10 @@ const router = Router();
 router.get("/analytics/warehouse", getWarehouseAnalytics);
 
 // Get inventory value statistics
-router.get("/stats/inventory-value", getInventoryValue);
+router.get("/analytics/inventory-value", getInventoryValue);
 
 // Get category statistics
-router.get("/stats/category", getCategoryStats);
+router.get("/analytics/category", getCategoryStats);
 
 // Get low stock items
 router.get("/stock/low-stock", getLowStockItems);
@@ -57,4 +57,3 @@ router.post("/:id/adjust-stock", adjustStock);
 router.delete("/:id", deleteItem);
 
 export default router;
-

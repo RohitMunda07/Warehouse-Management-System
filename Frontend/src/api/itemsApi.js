@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API Configuration
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_URL || 'http://localhost:8000/api/v1');
 
 // Create axios instance with base config
 const client = axios.create({ 
@@ -12,6 +12,14 @@ const client = axios.create({
   }
 });
 
+function unwrapResponseData(response) {
+  const payload = response?.data;
+  if (payload && typeof payload === 'object' && 'data' in payload) {
+    return payload.data;
+  }
+  return payload;
+}
+
 /**
  * MongoDB documents come back with `_id`, not `id` — normalizing here once
  * means every component downstream can just use `item.id` and never has to
@@ -19,7 +27,19 @@ const client = axios.create({
  */
 function normalize(item) {
   if (!item) return item;
-  return { ...item, id: item.id || item._id };
+
+  const firstWarehouseStock = Array.isArray(item.warehouseStocks) ? item.warehouseStocks[0] : null;
+
+  return {
+    ...item,
+    id: item.id || item._id,
+    location: item.location || firstWarehouseStock?.binNumber || firstWarehouseStock?.location || '',
+    unitCost: Number(item.unitCost ?? 0),
+    quantity: Number(item.quantity ?? 0),
+    reorderThreshold: Number(item.reorderThreshold ?? 0),
+    maxStock: Number(item.maxStock ?? item.quantity ?? 1),
+    notes: item.notes || '',
+  };
 }
 
 /**
@@ -42,7 +62,7 @@ function normalizeArray(items) {
  */
 export const fetchItems = () =>
   client.get('/items')
-    .then((res) => normalizeArray(res.data))
+    .then((res) => normalizeArray(unwrapResponseData(res)))
     .catch((error) => {
       console.error('Error fetching items:', error);
       throw error;
@@ -57,7 +77,7 @@ export const fetchItems = () =>
  */
 export const getItemById = (id) =>
   client.get(`/items/${id}`)
-    .then((res) => normalize(res.data))
+    .then((res) => normalize(unwrapResponseData(res)))
     .catch((error) => {
       console.error(`Error fetching item ${id}:`, error);
       throw error;
@@ -72,7 +92,7 @@ export const getItemById = (id) =>
  */
 export const createItem = (item) =>
   client.post('/items', item)
-    .then((res) => normalize(res.data))
+    .then((res) => normalize(unwrapResponseData(res)))
     .catch((error) => {
       console.error('Error creating item:', error);
       throw error;
@@ -88,7 +108,7 @@ export const createItem = (item) =>
  */
 export const updateItem = (id, item) =>
   client.put(`/items/${id}`, item)
-    .then((res) => normalize(res.data))
+    .then((res) => normalize(unwrapResponseData(res)))
     .catch((error) => {
       console.error(`Error updating item ${id}:`, error);
       throw error;
@@ -103,7 +123,7 @@ export const updateItem = (id, item) =>
  */
 export const deleteItem = (id) =>
   client.delete(`/items/${id}`)
-    .then((res) => res.data)
+    .then((res) => unwrapResponseData(res))
     .catch((error) => {
       console.error(`Error deleting item ${id}:`, error);
       throw error;
@@ -133,7 +153,7 @@ export const searchItems = (q = '', category = '', status = 'active') => {
   if (status) params.append('status', status);
   
   return client.get(`/items/search?${params.toString()}`)
-    .then((res) => normalizeArray(res.data))
+    .then((res) => normalizeArray(unwrapResponseData(res)))
     .catch((error) => {
       console.error('Error searching items:', error);
       throw error;
@@ -150,7 +170,7 @@ export const searchItems = (q = '', category = '', status = 'active') => {
  */
 export const getLowStockItems = () =>
   client.get('/items/stock/low-stock')
-    .then((res) => normalizeArray(res.data))
+    .then((res) => normalizeArray(unwrapResponseData(res)))
     .catch((error) => {
       console.error('Error fetching low stock items:', error);
       throw error;
@@ -181,7 +201,7 @@ export const getLowStockItems = () =>
  */
 export const getWarehouseAnalytics = () =>
   client.get('/items/analytics/warehouse')
-    .then((res) => res.data)
+    .then((res) => unwrapResponseData(res))
     .catch((error) => {
       console.error('Error fetching warehouse analytics:', error);
       throw error;
@@ -204,7 +224,7 @@ export const getWarehouseAnalytics = () =>
  */
 export const getInventoryValue = () =>
   client.get('/items/stats/inventory-value')
-    .then((res) => res.data)
+    .then((res) => unwrapResponseData(res))
     .catch((error) => {
       console.error('Error fetching inventory value:', error);
       throw error;
@@ -229,7 +249,7 @@ export const getInventoryValue = () =>
  */
 export const getCategoryStats = () =>
   client.get('/items/stats/category')
-    .then((res) => res.data)
+    .then((res) => unwrapResponseData(res))
     .catch((error) => {
       console.error('Error fetching category stats:', error);
       throw error;
@@ -289,7 +309,7 @@ export const adjustStock = (id, adjustment) => {
   }
   
   return client.post(`/items/${id}/adjust-stock`, adjustment)
-    .then((res) => normalize(res.data))
+    .then((res) => normalize(unwrapResponseData(res)))
     .catch((error) => {
       console.error(`Error adjusting stock for item ${id}:`, error);
       throw error;
@@ -319,40 +339,4 @@ export const handleApiError = (error) => {
     errors: []
   };
 };
-
-/* ========================================================================== */
-/*                    AXIOS INTERCEPTORS (Optional)                          */
-/* ========================================================================== */
-
-/**
- * Request interceptor - Add auth token if available
- */
-client.interceptors.request.use(
-  (config) => {
-    // Uncomment if using JWT authentication
-    // const token = localStorage.getItem('authToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-/**
- * Response interceptor - Handle common errors
- */
-client.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Redirect to login if unauthorized
-      // window.location.href = '/login';
-      console.warn('Unauthorized - redirect to login');
-    }
-    return Promise.reject(error);
-  }
-);
-
-export default client;
 

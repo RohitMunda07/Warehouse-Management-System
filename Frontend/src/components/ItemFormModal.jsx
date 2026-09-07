@@ -84,16 +84,34 @@ export default function ItemFormModal() {
       return;
     }
     setSubmitting(true);
+
+    const quantity = Number(form.quantity);
+    const reorderThreshold = Number(form.reorderThreshold || 0);
+    const maxStockValue = Number(form.maxStock || Math.max(quantity, 1));
+    const unitCost = Number(form.unitCost || 0);
+    const location = form.location.trim();
+
     const payload = {
+      sku: editingItem ? editingItem.sku : `SKU-${Date.now().toString().slice(-6)}`,
       name: form.name.trim(),
       category: form.category,
-      location: form.location.trim(),
-      quantity: Number(form.quantity),
-      reorderThreshold: Number(form.reorderThreshold || 0),
-      maxStock: Number(form.maxStock || Math.max(Number(form.quantity), 1)),
-      unitCost: Number(form.unitCost || 0),
+      location,
+      warehouseStocks: [{
+        location: 'aisle_a',
+        quantity,
+        binNumber: location,
+      }],
+      quantity,
+      unit: 'piece',
+      unitCost,
+      sellingPrice: Number((unitCost > 0 ? unitCost * 1.2 : 0).toFixed(2)),
+      reorderThreshold,
+      maxStock: maxStockValue,
+      status: 'active',
       notes: form.notes.trim(),
+      description: form.notes.trim(),
     };
+
     await saveItem(payload);
     setSubmitting(false);
   }

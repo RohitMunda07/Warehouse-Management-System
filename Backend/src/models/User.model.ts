@@ -25,7 +25,6 @@ export enum UserStatus {
 
 export interface UserDocument extends Document {
     fullname: string;
-    username: string;
     email: string;
     password: string;
     phone: string;
@@ -35,10 +34,10 @@ export interface UserDocument extends Document {
         publicId: string;
     };
 
-    company: string;
-    designation: string;
-    website: string;
-    bio: string;
+    company?: string;
+    designation?: string;
+    website?: string;
+    bio?: string;
 
     role: UserRole;
     status: UserStatus;
@@ -75,15 +74,6 @@ const UserDbSchema = new Schema<UserDocument>(
             trim: true,
             required: [true, "Full name is required"],
             index: true
-        },
-
-        username: {
-            type: String,
-            trim: true,
-            lowercase: true,
-            unique: true,
-            index: true,
-            required: [true, "Username is required"]
         },
 
         email: {
@@ -216,12 +206,6 @@ const UserDbSchema = new Schema<UserDocument>(
 /*                                  INDEXES                                   */
 /* -------------------------------------------------------------------------- */
 
-// UserDbSchema.index({ email: 1 });
-
-// UserDbSchema.index({ username: 1 });
-
-// UserDbSchema.index({ phone: 1 });
-
 UserDbSchema.index({
     fullname: "text",
     company: "text"
@@ -263,7 +247,6 @@ UserDbSchema.methods.generateAccessToken = function (): string {
         {
             _id: this._id,
             fullname: this.fullname,
-            username: this.username,
             email: this.email,
             role: this.role
         },
@@ -326,10 +309,15 @@ UserDbSchema.set("toObject", {
 });
 
 /* -------------------------------------------------------------------------- */
-/*                                  EXPORT                                    */
+/*                                  MODEL                                    */
 /* -------------------------------------------------------------------------- */
 
 export const UserModel = mongoose.model<UserDocument>(
     "UserModel",
     UserDbSchema
 );
+
+// Drop old username index if it exists
+UserModel.collection.dropIndex("username_1").catch(() => {
+    // Index doesn't exist, that's fine
+});

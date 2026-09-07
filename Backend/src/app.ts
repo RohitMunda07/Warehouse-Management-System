@@ -6,7 +6,6 @@ const app = express()
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
-    // origin: "http://localhost:5173",
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -19,12 +18,22 @@ app.use(cookieParser())
 // ------- routes import -------
 import {
     userRoute,
-    itemRouter
+    itemRouter,
+    categoryRouter
 } from "./routes/routes.js"
 
-app.use("/api/v1/user", userRoute)
-app.use("/api/items", itemRouter)
+// ------- API Routes -------
+app.use("/api/v1/users", userRoute)
+app.use("/api/v1/items", itemRouter)
+app.use("/api/v1/categories", categoryRouter)
 
-
+// Health check endpoint
+app.get("/health", (req, res) => {
+    res.json({
+        status: 200,
+        message: "Server is running",
+        timestamp: new Date()
+    })
+})
 
 export default app;

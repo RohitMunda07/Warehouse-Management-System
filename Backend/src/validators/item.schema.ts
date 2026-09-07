@@ -25,6 +25,22 @@ export const CreateItemSchema = z.object({
         .trim()
         .max(50, { message: "Barcode cannot exceed 50 characters" })
         .optional(),
+
+    location: z
+        .string()
+        .trim()
+        .max(100, { message: "Location cannot exceed 100 characters" })
+        .optional(),
+    
+    warehouseStocks: z
+        .array(
+            z.object({
+                location: z.string().trim().min(1, { message: "Warehouse location is required" }),
+                quantity: z.number().min(0, { message: "Warehouse quantity cannot be negative" }),
+                binNumber: z.string().trim().max(50).optional()
+            })
+        )
+        .optional(),
     
     category: z
         .string()
@@ -55,11 +71,11 @@ export const CreateItemSchema = z.object({
     
     unitCost: z
         .number()
-        .positive({ message: "Unit cost must be positive" }),
+        .min(0, { message: "Unit cost cannot be negative" }),
     
     sellingPrice: z
         .number()
-        .positive({ message: "Selling price must be positive" }),
+        .min(0, { message: "Selling price cannot be negative" }),
     
     reorderThreshold: z
         .number()
@@ -170,22 +186,34 @@ export const CreateItemSchema = z.object({
         .string()
         .datetime()
         .optional()
-});
+}).strict();
 
-export const UpdateItemSchema = CreateItemSchema.partial();
+export const UpdateItemSchema = CreateItemSchema.partial().strict();
 
 export const GetItemSchema = z.object({
-    id: z.string().min(1, { message: "Item ID is required" })
+    id: z
+        .string()
+        .min(1, { message: "Item ID is required" })
+        .regex(/^[0-9a-fA-F]{24}$/, { message: "Invalid MongoDB ID format" })
 });
 
 export const DeleteItemSchema = z.object({
-    id: z.string().min(1, { message: "Item ID is required" })
+    id: z
+        .string()
+        .min(1, { message: "Item ID is required" })
+        .regex(/^[0-9a-fA-F]{24}$/, { message: "Invalid MongoDB ID format" })
 });
 
 export const AdjustStockSchema = z.object({
     quantity: z
         .number({ message: "Quantity must be a number" })
+        .positive({ message: "Quantity must be positive" })
         .int({ message: "Quantity must be a whole number" }),
+    
+    type: z
+        .enum(["inbound", "outbound", "adjustment", "damage", "return"], {
+            message: "Invalid stock movement type"
+        }),
     
     reason: z
         .string()
@@ -197,10 +225,46 @@ export const AdjustStockSchema = z.object({
         .string()
         .trim()
         .max(100, { message: "Reference cannot exceed 100 characters" })
-        .optional(),
-    
-    type: z
-        .enum(["inbound", "outbound", "adjustment", "damage", "return"])
         .optional()
+        .nullable(),
+    
+    location: z
+        .string()
+        .trim()
+        .optional()
+        .nullable(),
 });
 
+export const SearchItemSchema = z.object({
+    query: z
+        .string()
+        .trim()
+        .min(1, { message: "Search query is required" })
+        .max(100, { message: "Search query cannot exceed 100 characters" }),
+    
+    page: z
+        .number()
+        .int()
+        .min(1, { message: "Page must be at least 1" })
+        .optional()
+        .default(1),
+    
+    limit: z
+        .number()
+        .int()
+        .min(1, { message: "Limit must be at least 1" })
+        .max(100, { message: "Limit cannot exceed 100" })
+        .optional()
+        .default(10),
+});
+
+/* -------------------------------------------------------------------------- */
+/*                         TYPE EXPORTS                                     */
+/* -------------------------------------------------------------------------- */
+
+export type CreateItemInput = z.infer<typeof CreateItemSchema>;
+export type UpdateItemInput = z.infer<typeof UpdateItemSchema>;
+export type GetItemInput = z.infer<typeof GetItemSchema>;
+export type DeleteItemInput = z.infer<typeof DeleteItemSchema>;
+export type AdjustStockInput = z.infer<typeof AdjustStockSchema>;
+export type SearchItemInput = z.infer<typeof SearchItemSchema>;
