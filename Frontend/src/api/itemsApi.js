@@ -7,9 +7,23 @@ const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.REACT_APP_API_
 const client = axios.create({ 
   baseURL: API_BASE,
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
+});
+
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('waretrack-token');
+
+  if (token) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
+  return config;
 });
 
 function unwrapResponseData(response) {

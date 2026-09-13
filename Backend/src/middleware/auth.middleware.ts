@@ -1,8 +1,6 @@
 import { asyncHandler, ApiError } from "../utils/modules.js";
 import jwt from "jsonwebtoken"
 import { UserModel } from "../models/User.model.js"
-import type { Request } from "express";
-import { type NextFunction } from "express";
 
 export const verifyJWT = asyncHandler(async(req, res, next) => {
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
@@ -20,16 +18,5 @@ export const verifyJWT = asyncHandler(async(req, res, next) => {
     }
 
     req.user = user
-    next()
-})
-
-export const verifyAdmin = asyncHandler(async (req, res, next) => {
-    if (!req.user) {
-        throw new ApiError(401, "Unauthorized Request", [], "")
-    }
-
-    if (req.user.role !== "admin") {
-        throw new ApiError(403, "Access denied. Admins only.", [], "")
-    }
     next()
 })

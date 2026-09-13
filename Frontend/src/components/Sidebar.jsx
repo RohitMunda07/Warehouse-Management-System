@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
 
 const NAV_ITEMS = [
-  { to: '/', icon: 'ti-layout-dashboard', label: 'Dashboard', end: true },
+  { to: '/dashboard', icon: 'ti-layout-dashboard', label: 'Dashboard', end: true },
   { to: '/inventory', icon: 'ti-package', label: 'Inventory' },
-  { to: '/receiving', icon: 'ti-truck-loading', label: 'Receiving' },
   { to: '/shipping', icon: 'ti-truck-delivery', label: 'Shipping' },
+  // { to: '/receiving', icon: 'ti-truck-loading', label: 'Receiving' },
   { to: '/reports', icon: 'ti-chart-bar', label: 'Reports' },
-  { to: '/settings', icon: 'ti-settings', label: 'Settings' },
+  // { to: '/settings', icon: 'ti-settings', label: 'Settings' },
 ];
 
 export default function Sidebar() {

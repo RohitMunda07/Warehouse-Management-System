@@ -4,6 +4,7 @@ import ApiResponse from "../utils/apiResponse.js";
 import ApiError from "../utils/apiError.js";
 import { CreateItemSchema, UpdateItemSchema, GetItemSchema, DeleteItemSchema, AdjustStockSchema } from "../validators/item.schema.js";
 import { ZodError } from "zod";
+import { ShipmentModel } from "../models/Shipment.model.js";
 
 /* -------------------------------------------------------------------------- */
 /*                           GET ALL ITEMS                                   */
@@ -489,6 +490,7 @@ export const getInventoryReports = asyncHandler(async (req, res) => {
     try {
         const filter: any = { status: "active" };
         const items = await ItemModel.find(filter).lean();
+        const shipments = await ShipmentModel.find().lean();
 
         const totalItems = items.length;
         const totalQuantity = items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
@@ -529,6 +531,15 @@ export const getInventoryReports = asyncHandler(async (req, res) => {
 
         const byCategory = [...byCategoryMap.values()].sort((a, b) => b.totalValue - a.totalValue);
 
+        const totalShippedUnits = shipments.reduce((sum, shipment) => sum + Number(shipment.quantity || 0), 0);
+        const shippingSummary = {
+            totalShipments: shipments.length,
+            totalUnitsShipped: totalShippedUnits,
+            deliveredCount: shipments.filter((shipment) => shipment.status === "Delivered").length,
+            inTransitCount: shipments.filter((shipment) => shipment.status === "In Transit").length,
+            delayedCount: shipments.filter((shipment) => shipment.status === "Delayed").length,
+        };
+
         return res.status(200).json(
             new ApiResponse(
                 200,
@@ -554,7 +565,8 @@ export const getInventoryReports = asyncHandler(async (req, res) => {
                             quantity: Number(item.quantity || 0),
                             reorderThreshold: Number(item.reorderThreshold || 0),
                             unitCost: Number(item.unitCost || 0)
-                        }))
+                        })),
+                    shipping: shippingSummary,
                 },
                 "Inventory report fetched successfully"
             )

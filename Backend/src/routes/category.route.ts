@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 import {
     getAllCategories,
     getCategoryById,
@@ -9,6 +10,8 @@ import {
 } from "../controllers/Category.controller.js";
 
 const router = Router();
+
+router.use(verifyJWT);
 
 /* -------------------------------------------------------------------------- */
 /*                        CATEGORY ROUTES                                   */

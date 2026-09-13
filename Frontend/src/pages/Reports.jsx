@@ -18,6 +18,13 @@ const emptyReport = {
   },
   byCategory: [],
   lowStock: [],
+  shipping: {
+    totalShipments: 0,
+    totalUnitsShipped: 0,
+    deliveredCount: 0,
+    inTransitCount: 0,
+    delayedCount: 0,
+  },
 };
 
 export default function Reports() {
@@ -138,6 +145,35 @@ export default function Reports() {
           </div>
 
           <div className="panel-row report-panel-row">
+            <div className="panel">
+              <h3>Shipping summary</h3>
+              <div className="health-summary">
+                <div className="score-box score-green">
+                  <span className="score-label">Shipments</span>
+                  <strong>{report.shipping?.totalShipments ?? 0}</strong>
+                </div>
+                <div className="score-box score-amber">
+                  <span className="score-label">In transit</span>
+                  <strong>{report.shipping?.inTransitCount ?? 0}</strong>
+                </div>
+                <div className="score-box score-red">
+                  <span className="score-label">Delivered</span>
+                  <strong>{report.shipping?.deliveredCount ?? 0}</strong>
+                </div>
+              </div>
+
+              <div className="report-summary" style={{ marginTop: '18px' }}>
+                <div>
+                  <span className="summary-label">Units shipped</span>
+                  <strong>{report.shipping?.totalUnitsShipped ?? 0}</strong>
+                </div>
+                <div>
+                  <span className="summary-label">Delayed</span>
+                  <strong>{report.shipping?.delayedCount ?? 0}</strong>
+                </div>
+              </div>
+            </div>
+
             <div className="panel">
               <h3>Low stock alert</h3>
               {(!report.lowStock || report.lowStock.length === 0) ? (

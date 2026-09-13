@@ -6,7 +6,7 @@ export default function BottomNav() {
 
   return (
     <nav className="bottom-nav" aria-label="Primary mobile">
-      <NavLink to="/" end className={({ isActive }) => 'bn-item' + (isActive ? ' active' : '')}>
+      <NavLink to="/dashboard" end className={({ isActive }) => 'bn-item' + (isActive ? ' active' : '')}>
         <i className="ti ti-layout-dashboard" aria-hidden="true" />
         Home
       </NavLink>
@@ -14,9 +14,13 @@ export default function BottomNav() {
         <i className="ti ti-package" aria-hidden="true" />
         Items
       </NavLink>
+      <NavLink to="/shipping" className={({ isActive }) => 'bn-item' + (isActive ? ' active' : '')}>
+        <i className="ti ti-truck-delivery" aria-hidden="true" />
+        Ship
+      </NavLink>
       <button type="button" className="bn-item bn-scan" onClick={openAddForm} aria-label="Add item">
         <i className="ti ti-scan" aria-hidden="true" />
-        Scan
+        Add
       </button>
       <NavLink to="/reports" className={({ isActive }) => 'bn-item' + (isActive ? ' active' : '')}>
         <i className="ti ti-chart-bar" aria-hidden="true" />

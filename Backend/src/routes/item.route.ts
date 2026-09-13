@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 import {
     getAllItems,
     getItemById,
@@ -15,6 +16,8 @@ import {
 } from "../controllers/Item.controller.js";
 
 const router = Router();
+
+router.use(verifyJWT);
 
 /* -------------------------------------------------------------------------- */
 /*                        ANALYTICS & STATS ROUTES                           */

@@ -19,13 +19,15 @@ app.use(cookieParser())
 import {
     userRoute,
     itemRouter,
-    categoryRouter
+    categoryRouter,
+    shipmentRouter,
 } from "./routes/routes.js"
 
 // ------- API Routes -------
 app.use("/api/v1/users", userRoute)
 app.use("/api/v1/items", itemRouter)
 app.use("/api/v1/categories", categoryRouter)
+app.use("/api/v1/shipments", shipmentRouter)
 
 // Health check endpoint
 app.get("/health", (req, res) => {

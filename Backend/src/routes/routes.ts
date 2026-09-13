@@ -1,9 +1,11 @@
 import userRoute from "./user.route.js"
 import itemRouter from "./item.route.js"
 import categoryRouter from "./category.route.js"
+import shipmentRouter from "./shipment.route.js"
 
 export {
     userRoute,
     itemRouter,
-    categoryRouter
+    categoryRouter,
+    shipmentRouter,
 }
