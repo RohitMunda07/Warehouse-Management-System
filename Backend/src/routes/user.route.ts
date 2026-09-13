@@ -15,7 +15,7 @@ const router = Router()
 
 router.post("/register", registerUser)
 router.post("/login", loginUser)
-router.post("/logout", verifyJWT, logoutUser)
+router.post("/logout", logoutUser)
 router.get("/", verifyJWT, getAllUsers)
 router.post("/refresh-token", refreshAccessToken)
 router.post("/change-password", verifyJWT, changeCurrentPassword)

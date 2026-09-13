@@ -159,22 +159,19 @@ const loginUser = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
 
     // $unset: {refreshToken} is used to remove the field from document
-
-    if (!req.user) {
-        throw new ApiError(401, "Unauthorized", [], "")
-    }
-
-    await UserModel.findByIdAndUpdate(
-        req.user._id,
-        {
-            $unset: {
-                refreshToken: 1
+    if (req.user?._id) {
+        await UserModel.findByIdAndUpdate(
+            req.user._id,
+            {
+                $unset: {
+                    refreshToken: 1
+                }
+            },
+            {
+                new: true
             }
-        },
-        {
-            new: true
-        }
-    )
+        )
+    }
 
     return res
         .status(200)
